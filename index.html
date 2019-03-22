@@ -8,7 +8,8 @@
 <script>
     a = document.querySelector("canvas");
     b = document.body;
-    g = a.getContext("webgl");
+    // XXX The official shim only provides as WebGL1 context.
+    g = a.getContext("webgl2");
     d = document;
 </script>
 <script src="index.js"></script>

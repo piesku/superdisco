@@ -1,0 +1,15 @@
+{
+  "name": "superdisco",
+  "version": "0.0.1",
+  "private": true,
+  "description": "A submission for JS1K 2019",
+  "contributors": [
+    "Michał Budzyński <michal@virtualdesign.pl>",
+    "Staś Małolepszy <stas@piesku.com>"
+  ],
+  "license": "ISC",
+  "dependencies": {
+    "regpack": "^5.0.1",
+    "terser": "^3.16.1"
+  }
+}

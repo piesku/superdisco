@@ -1,7 +1,7 @@
 g.clearColor(1.0, 0.3, 0.3, 1.0);
 g.enable(g.DEPTH_TEST);
 g.enable(g.CULL_FACE);
-g.enable(g.CW);
+g.frontFace(g.CW);
 
 let vertices = Float32Array.from([
     -1, -1, 1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1,
@@ -53,7 +53,7 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
 
     void main() {
         gl_Position = projection * view * model * vec4(position, 1.0);
-        vert_color = vec4(1.0, 1.0, 0.3, 1.0);
+        vert_color = vec4(normal, 1.0);
     }
 `);
 

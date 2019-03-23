@@ -1,4 +1,4 @@
-g.clearColor(1.0, 0.3, 0.3, 1.0);
+g.clearColor(1.0, 0.7, 0.0, 1.0);
 g.enable(g.DEPTH_TEST);
 g.enable(g.CULL_FACE);
 g.frontFace(g.CW);
@@ -49,10 +49,15 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
         1.0, 0.0, 0.0, 0.0,
         0.0, 1.0, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
-        3.0, 0.0, 0.0, 1.0);
+        0.0, 0.0, 0.0, 1.0);
+
+    vec3 translate(int id) {
+        return vec3(-3 + 3 * id, 0, 0);
+    }
 
     void main() {
-        gl_Position = projection * view * model * vec4(position, 1.0);
+        vec3 translation = translate(gl_InstanceID);
+        gl_Position = projection * view * model * vec4(position + translation, 1.0);
         vert_color = vec4(normal, 1.0);
     }
 `);
@@ -88,4 +93,4 @@ g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, g.createBuffer());
 g.bufferData(g.ELEMENT_ARRAY_BUFFER, indices, g.STATIC_DRAW);
 
 g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
-g.drawElements(g.TRIANGLES, 36, g.UNSIGNED_SHORT, 0);
+g.drawElementsInstanced(g.TRIANGLES, 36, g.UNSIGNED_SHORT, 0, 3);

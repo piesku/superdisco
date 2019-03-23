@@ -29,8 +29,9 @@ function compile_shader(type, source) {
 }
 
 let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
-    layout(location = 0) in vec3 position;
-    layout(location = 1) in vec3 normal;
+    uniform float now;
+    layout(location = 5) in vec3 position;
+    layout(location = 6) in vec3 normal;
     out vec4 vert_color;
 
     // XXX When optimizing for size, pre-calculate the product of these three
@@ -52,7 +53,8 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
         0.0, 0.0, 0.0, 1.0);
 
     vec3 translate(int id) {
-        return vec3(-3 + 3 * id, 0, 0);
+        float width = 3.0 + sin(now / 1000.0);
+        return vec3(-3.0 + width * float(id), 0, 0);
     }
 
     void main() {
@@ -75,10 +77,13 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
 
 {
     // Set up the GL program.
-    let program = g.createProgram();
+    var program = g.createProgram();
     g.attachShader(program, vert_shader);
     g.attachShader(program, frag_shader);
     g.linkProgram(program);
+    var uniform_now = g.getUniformLocation(program, "now");
+
+    // And make it the only active one.
     g.useProgram(program);
 }
 
@@ -86,20 +91,24 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     // Buffer vertex data for a cube.
     g.bindBuffer(g.ARRAY_BUFFER, g.createBuffer());
     g.bufferData(g.ARRAY_BUFFER, vertices, g.STATIC_DRAW);
-    g.enableVertexAttribArray(0);
-    g.vertexAttribPointer(0, 3, g.FLOAT, g.FALSE, 0, 0);
+    g.enableVertexAttribArray(5);
+    g.vertexAttribPointer(5, 3, g.FLOAT, g.FALSE, 0, 0);
 
     g.bindBuffer(g.ARRAY_BUFFER, g.createBuffer());
     g.bufferData(g.ARRAY_BUFFER, normals, g.STATIC_DRAW);
-    g.enableVertexAttribArray(1);
-    g.vertexAttribPointer(1, 3, g.FLOAT, g.FALSE, 0, 0);
+    g.enableVertexAttribArray(6);
+    g.vertexAttribPointer(6, 3, g.FLOAT, g.FALSE, 0, 0);
 
     g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, g.createBuffer());
     g.bufferData(g.ELEMENT_ARRAY_BUFFER, indices, g.STATIC_DRAW);
 }
 
-{
-    // XXX Run this in a render loop.
+function tick(now) {
     g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
+    g.uniform1f(uniform_now, now);
     g.drawElementsInstanced(g.TRIANGLES, 36, g.UNSIGNED_SHORT, 0, 3);
+
+    requestAnimationFrame(tick);
 }
+
+tick(0);

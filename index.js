@@ -28,33 +28,6 @@ function compile_shader(type, source) {
     return shader;
 }
 
-function create_vao(vertices, indices, normals) {
-    let vao = g.createVertexArray()
-    g.bindVertexArray(vao);
-
-    g.bindBuffer(g.ARRAY_BUFFER, g.createBuffer());
-    g.bufferData(g.ARRAY_BUFFER, normals, g.STATIC_DRAW);
-    g.enableVertexAttribArray(1);
-    g.vertexAttribPointer(1, 3, g.FLOAT, g.FALSE, 0, 0);
-
-    g.bindBuffer(g.ARRAY_BUFFER, g.createBuffer());
-    g.bufferData(g.ARRAY_BUFFER, vertices, g.STATIC_DRAW);
-    g.enableVertexAttribArray(0);
-    g.vertexAttribPointer(0, 3, g.FLOAT, g.FALSE, 0, 0);
-
-    g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, g.createBuffer());
-    g.bufferData(g.ELEMENT_ARRAY_BUFFER, indices, g.STATIC_DRAW);
-
-    g.bindVertexArray(null);
-    return vao;
-}
-
-function draw(vao) {
-    g.bindVertexArray(vao);
-    g.drawElements(g.TRIANGLES, 36, g.UNSIGNED_SHORT, 0);
-    g.bindVertexArray(null);
-}
-
 let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
     layout(location = 0) in vec3 position;
     layout(location = 1) in vec3 normal;
@@ -94,7 +67,18 @@ g.attachShader(program, frag_shader);
 g.linkProgram(program);
 g.useProgram(program);
 
-let vao = create_vao(vertices, indices, normals);
+g.bindBuffer(g.ARRAY_BUFFER, g.createBuffer());
+g.bufferData(g.ARRAY_BUFFER, vertices, g.STATIC_DRAW);
+g.enableVertexAttribArray(0);
+g.vertexAttribPointer(0, 3, g.FLOAT, g.FALSE, 0, 0);
+
+g.bindBuffer(g.ARRAY_BUFFER, g.createBuffer());
+g.bufferData(g.ARRAY_BUFFER, normals, g.STATIC_DRAW);
+g.enableVertexAttribArray(1);
+g.vertexAttribPointer(1, 3, g.FLOAT, g.FALSE, 0, 0);
+
+g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, g.createBuffer());
+g.bufferData(g.ELEMENT_ARRAY_BUFFER, indices, g.STATIC_DRAW);
 
 g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
-draw(vao);
+g.drawElements(g.TRIANGLES, 36, g.UNSIGNED_SHORT, 0);

@@ -13,7 +13,8 @@ regpacked.js: minified.js
 		--crushLengthFactor 0 \
 		--crushCopiesFactor 0 \
 		--withMath 0 \
-		--contextVariableName c \
+		--contextType 1 \
+		--contextVariableName g \
 		--hashWebGLContext 1 \
 		--wrapInSetInterval 1 \
 	> $@

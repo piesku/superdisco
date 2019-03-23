@@ -33,19 +33,26 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
     layout(location = 1) in vec3 normal;
     out vec4 vert_color;
 
+    // XXX When optimizing for size, pre-calculate the product of these three
+    // matrices into a single pvm matrix.
     const mat4 projection = mat4(
         0.75, 0.0, 0.0, 0.0,
         0.0, 1.0, 0.0, 0.0,
         0.0, 0.0, -1.0, -1.0,
         0.0, 0.0, -2.0, 0.0);
+    const mat4 view = mat4(
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 0.83, 0.56, 0.0,
+        0.0, -0.56, 0.83, 0.0,
+        0.0, -1.89, -9.72, 1.0);
     const mat4 model = mat4(
         1.0, 0.0, 0.0, 0.0,
         0.0, 1.0, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
-        2.0, -2.0, -5.0, 1.0);
+        3.0, 0.0, 0.0, 1.0);
 
     void main() {
-        gl_Position = projection * model * vec4(position, 1.0);
+        gl_Position = projection * view * model * vec4(position, 1.0);
         vert_color = vec4(1.0, 1.0, 0.3, 1.0);
     }
 `);

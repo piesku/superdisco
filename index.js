@@ -60,22 +60,20 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
     layout(location = 1) in vec3 normal;
     out vec4 vert_color;
 
-    const mat4 pv = mat4(
-        0.5596334934234619, 0.0, 0.0, 0.0,
-        0, 1.8304877281188965, 0.0, 0.0,
-        0.0, 0.0, -1.0020020008087158, -1.0,
-        0.0, 0.0, 9.819819450378418, 10.0);
-
-    const vec4 color = vec4(1.0, 1.0, 0.3, 1.0);
+    const mat4 projection = mat4(
+        0.75, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, -1.0, -1.0,
+        0.0, 0.0, -2.0, 0.0);
     const mat4 model = mat4(
         1.0, 0.0, 0.0, 0.0,
         0.0, 1.0, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
-        2.0, -2.0, 0.0, 1.0);
+        2.0, -2.0, -5.0, 1.0);
 
     void main() {
-        gl_Position = pv * model * vec4(position, 1.0);
-        vert_color = color;
+        gl_Position = projection * model * vec4(position, 1.0);
+        vert_color = vec4(1.0, 1.0, 0.3, 1.0);
     }
 `);
 

@@ -73,24 +73,33 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     }
 `);
 
-let program = g.createProgram();
-g.attachShader(program, vert_shader);
-g.attachShader(program, frag_shader);
-g.linkProgram(program);
-g.useProgram(program);
+{
+    // Set up the GL program.
+    let program = g.createProgram();
+    g.attachShader(program, vert_shader);
+    g.attachShader(program, frag_shader);
+    g.linkProgram(program);
+    g.useProgram(program);
+}
 
-g.bindBuffer(g.ARRAY_BUFFER, g.createBuffer());
-g.bufferData(g.ARRAY_BUFFER, vertices, g.STATIC_DRAW);
-g.enableVertexAttribArray(0);
-g.vertexAttribPointer(0, 3, g.FLOAT, g.FALSE, 0, 0);
+{
+    // Buffer vertex data for a cube.
+    g.bindBuffer(g.ARRAY_BUFFER, g.createBuffer());
+    g.bufferData(g.ARRAY_BUFFER, vertices, g.STATIC_DRAW);
+    g.enableVertexAttribArray(0);
+    g.vertexAttribPointer(0, 3, g.FLOAT, g.FALSE, 0, 0);
 
-g.bindBuffer(g.ARRAY_BUFFER, g.createBuffer());
-g.bufferData(g.ARRAY_BUFFER, normals, g.STATIC_DRAW);
-g.enableVertexAttribArray(1);
-g.vertexAttribPointer(1, 3, g.FLOAT, g.FALSE, 0, 0);
+    g.bindBuffer(g.ARRAY_BUFFER, g.createBuffer());
+    g.bufferData(g.ARRAY_BUFFER, normals, g.STATIC_DRAW);
+    g.enableVertexAttribArray(1);
+    g.vertexAttribPointer(1, 3, g.FLOAT, g.FALSE, 0, 0);
 
-g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, g.createBuffer());
-g.bufferData(g.ELEMENT_ARRAY_BUFFER, indices, g.STATIC_DRAW);
+    g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, g.createBuffer());
+    g.bufferData(g.ELEMENT_ARRAY_BUFFER, indices, g.STATIC_DRAW);
+}
 
-g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
-g.drawElementsInstanced(g.TRIANGLES, 36, g.UNSIGNED_SHORT, 0, 3);
+{
+    // XXX Run this in a render loop.
+    g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
+    g.drawElementsInstanced(g.TRIANGLES, 36, g.UNSIGNED_SHORT, 0, 3);
+}

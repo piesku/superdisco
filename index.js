@@ -31,6 +31,7 @@ function compile_shader(type, source) {
 
 let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
     uniform float now;
+    uniform vec2 mouse;
     layout(location = 5) in vec3 position;
     out vec4 vert_position;
 
@@ -72,11 +73,11 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
         float offset = now / 100.0;
         float y = 5.0 * sin(-offset / 10.0) + 10.0;
 
-        float rotation = now / 5000.0;
+        float rotx = mouse.x * 6.28;
         mat4 model = mat4(
-            cos(rotation), 0.0, -sin(rotation), 0.0,
+            cos(rotx), 0.0, -sin(rotx), 0.0,
             0.0, 1.0, 0.0, 0.0,
-            sin(rotation), 0.0, cos(rotation), 0.0,
+            sin(rotx), 0.0, cos(rotx), 0.0,
             0.0, -y, 0.0, 1.0);
 
         vec3 translation = translate(gl_InstanceID, offset);
@@ -101,6 +102,13 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     }
 `);
 
+let mousex = 0;
+let mousey = 0;
+a.onmousemove = e => {
+    mousex = (e.clientX - e.target.offsetLeft) / e.target.width;
+    mousey = (e.clientY - e.target.offsetTop) / e.target.height;
+};
+
 {
     // Set up the GL program.
     var program = g.createProgram();
@@ -112,6 +120,7 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
         throw new Error(g.getProgramInfoLog(program));  // DEBUG
 
     var uniform_now = g.getUniformLocation(program, "now");
+    var uniform_mouse = g.getUniformLocation(program, "mouse");
 
     // And make it the only active one.
     g.useProgram(program);
@@ -131,6 +140,7 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
 function tick(now) {
     g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
     g.uniform1f(uniform_now, now);
+    g.uniform2f(uniform_mouse, mousex, mousey);
     g.drawElementsInstanced(g.TRIANGLES, 36, g.UNSIGNED_SHORT, 0, EDGE_COUNT * EDGE_COUNT);
 
     requestAnimationFrame(tick);

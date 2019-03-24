@@ -25,6 +25,10 @@ function compile_shader(type, source) {
     let shader = g.createShader(type);
     g.shaderSource(shader, source);
     g.compileShader(shader);
+
+    if (!g.getShaderParameter(shader, g.COMPILE_STATUS)) // DEBUG
+        throw new Error(g.getShaderInfoLog(shader));     // DEBUG
+
     return shader;
 }
 
@@ -97,6 +101,10 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     g.attachShader(program, vert_shader);
     g.attachShader(program, frag_shader);
     g.linkProgram(program);
+
+    if (!g.getProgramParameter(program, g.LINK_STATUS)) // DEBUG
+        throw new Error(g.getProgramInfoLog(program));  // DEBUG
+
     var uniform_now = g.getUniformLocation(program, "now");
 
     // And make it the only active one.

@@ -17,13 +17,6 @@ let indices = Uint16Array.from([
     11, 10, 8, 10, 9, 8, 7, 6, 4, 6, 5, 4, 3, 2, 0, 2, 1, 0
 ]);
 
-let normals = Float32Array.from([
-    -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
-    0, -1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
-    0, 1, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
-    0, 1, 0
-]);
-
 
 function compile_shader(type, source) {
     let shader = g.createShader(type);
@@ -39,8 +32,6 @@ function compile_shader(type, source) {
 let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
     uniform float now;
     layout(location = 5) in vec3 position;
-    layout(location = 6) in vec3 normal;
-    out vec4 vert_color;
     out vec4 vert_position;
 
     const float edge_count = ${EDGE_COUNT}.0;
@@ -90,7 +81,6 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
 
         vec3 translation = translate(gl_InstanceID, offset);
         gl_Position = projection * view * model * vec4(position + translation, 1.0);
-        vert_color = vec4(normal, 1.0);
         vert_position = gl_Position;
     }
 `);
@@ -99,15 +89,15 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     precision mediump float;
 
     in vec4 vert_position;
-    in vec4 vert_color;
     out vec4 frag_color;
 
     const vec4 fog_color = vec4(1.0, 0.7, 0.0, 1.0);
     const float fog_max = 500.0;
 
     void main() {
+        vec4 normal = vec4(normalize(cross(dFdx(vert_position).xyz, dFdy(vert_position).xyz)), 1.0);
         float distance = length(vert_position - vec4(0.0));
-        frag_color = mix(vert_color, fog_color, clamp(distance / fog_max, 0.0, 1.0));
+        frag_color = mix(normal, fog_color, clamp(distance / fog_max, 0.0, 1.0));
     }
 `);
 
@@ -133,11 +123,6 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     g.bufferData(g.ARRAY_BUFFER, vertices, g.STATIC_DRAW);
     g.enableVertexAttribArray(5);
     g.vertexAttribPointer(5, 3, g.FLOAT, g.FALSE, 0, 0);
-
-    g.bindBuffer(g.ARRAY_BUFFER, g.createBuffer());
-    g.bufferData(g.ARRAY_BUFFER, normals, g.STATIC_DRAW);
-    g.enableVertexAttribArray(6);
-    g.vertexAttribPointer(6, 3, g.FLOAT, g.FALSE, 0, 0);
 
     g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, g.createBuffer());
     g.bufferData(g.ELEMENT_ARRAY_BUFFER, indices, g.STATIC_DRAW);

@@ -3,6 +3,8 @@ g.enable(g.DEPTH_TEST);
 g.enable(g.CULL_FACE);
 g.frontFace(g.CW);
 
+let EDGE_COUNT = 300;
+
 let vertices = Float32Array.from([
     -1, -1, 1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1,
     -1, 1, -1, -1, 1, -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, 1, -1, 1, 1, 1, 1,
@@ -61,13 +63,10 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
     }
 
     vec3 translate(int id) {
-        float width = 2.0;// + sin(now / 1000.0);
-        float start_x = -50.0;
-        float start_y = -30.0;
-        float max_in_row = 50.0;
-        float x = start_x + mod(float(id), max_in_row) * width;
-        float y = start_y + (floor(float(id) / max_in_row) * width);
-        return vec3(x, rand(float(id)), y);
+        float count = ${EDGE_COUNT}.0;
+        float x = -count + mod(float(id), count) * 2.0;
+        float z = -count + (float(id) / count) * 2.0;
+        return vec3(x, rand(float(id)), z);
     }
 
     void main() {
@@ -130,7 +129,7 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
 function tick(now) {
     g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
     g.uniform1f(uniform_now, now);
-    g.drawElementsInstanced(g.TRIANGLES, 36, g.UNSIGNED_SHORT, 0, 100000);
+    g.drawElementsInstanced(g.TRIANGLES, 36, g.UNSIGNED_SHORT, 0, EDGE_COUNT * EDGE_COUNT);
 
     requestAnimationFrame(tick);
 }

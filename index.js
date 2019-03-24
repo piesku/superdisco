@@ -41,6 +41,7 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
     layout(location = 5) in vec3 position;
     layout(location = 6) in vec3 normal;
     out vec4 vert_color;
+    out vec4 vert_position;
 
     const float edge_count = ${EDGE_COUNT}.0;
 
@@ -70,9 +71,9 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
         float x = -edge_count + mod(float(id), edge_count) * 2.0;
         float z = -edge_count + (float(id) / edge_count) * 2.0;
         float move = z - discrete(offset);
-        float y = 10.0 * sin(x / 10.0) * sin(move / 10.0);
+        float y = 10.0 * sin(x / 30.0) * sin(move / 10.0);
+        float hills = 100.0 * sin(x / 100.0) * sin(move / 300.0);
         float noise = 4.0 * rand(move);
-        float hills = 100.0 * sin(x / 100.0) * sin(move / 100.0);
         return vec3(x, hills + y + noise, z + mod(offset, 2.0));
     }
 
@@ -90,17 +91,23 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
         vec3 translation = translate(gl_InstanceID, offset);
         gl_Position = projection * view * model * vec4(position + translation, 1.0);
         vert_color = vec4(normal, 1.0);
+        vert_position = gl_Position;
     }
 `);
 
 let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     precision mediump float;
 
+    in vec4 vert_position;
     in vec4 vert_color;
     out vec4 frag_color;
 
+    const vec4 fog_color = vec4(1.0, 0.7, 0.0, 1.0);
+    const float fog_max = 500.0;
+
     void main() {
-        frag_color = vert_color;
+        float distance = length(vert_position - vec4(0.0));
+        frag_color = mix(vert_color, fog_color, clamp(distance / fog_max, 0.0, 1.0));
     }
 `);
 

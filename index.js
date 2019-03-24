@@ -46,11 +46,7 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
         0.0, 0.83, 0.56, 0.0,
         0.0, -0.56, 0.83, 0.0,
         0.0, -1.89, -9.72, 1.0);
-    const mat4 model = mat4(
-        1.0, 0.0, 0.0, 0.0,
-        0.0, 1.0, 0.0, 0.0,
-        0.0, 0.0, 1.0, 0.0,
-        0.0, 0.0, 0.0, 1.0);
+
 
     float rand(float x) {
         return fract(sin(x) * 1000.0);
@@ -71,6 +67,13 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
     }
 
     void main() {
+        float rotation = now / 5000.0;
+        mat4 model = mat4(
+            cos(rotation), 0.0, -sin(rotation), 0.0,
+            0.0, 1.0, 0.0, 0.0,
+            sin(rotation), 0.0, cos(rotation), 0.0,
+            0.0, 0.0, 0.0, 1.0);
+
         vec3 translation = translate(gl_InstanceID);
         gl_Position = projection * view * model * vec4(position + translation, 1.0);
         vert_color = vec4(normal, 1.0);
@@ -119,7 +122,7 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
 function tick(now) {
     g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
     g.uniform1f(uniform_now, now);
-    g.drawElementsInstanced(g.TRIANGLES, 36, g.UNSIGNED_SHORT, 0, 1000);
+    g.drawElementsInstanced(g.TRIANGLES, 36, g.UNSIGNED_SHORT, 0, 100000);
 
     requestAnimationFrame(tick);
 }

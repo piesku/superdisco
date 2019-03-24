@@ -43,15 +43,15 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
     // XXX When optimizing for size, pre-calculate the product of these three
     // matrices into a single pvm matrix.
     const mat4 projection = mat4(
-        0.75, 0.0, 0.0, 0.0,
-        0.0, 1.0, 0.0, 0.0,
+        1.3, 0.0, 0.0, 0.0,
+        0.0, 1.73, 0.0, 0.0,
         0.0, 0.0, -1.0, -1.0,
         0.0, 0.0, -2.0, 0.0);
     const mat4 view = mat4(
         1.0, 0.0, 0.0, 0.0,
-        0.0, 0.83, 0.56, 0.0,
-        0.0, -0.56, 0.83, 0.0,
-        0.0, -1.89, -9.72, 1.0);
+        0.0, 0.96, 0.29, 0.0,
+        0.0, -0.29, 0.96, 0.0,
+        0.0, -9.56, -2.92, 1.0);
 
 
     float rand(float x) {

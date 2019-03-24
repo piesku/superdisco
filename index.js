@@ -3,7 +3,7 @@ g.enable(g.DEPTH_TEST);
 g.enable(g.CULL_FACE);
 g.frontFace(g.CW);
 
-let EDGE_COUNT = 200;
+let EDGE_COUNT = 300;
 
 let vertices = Float32Array.from([
     -1, -9, 1, -1, 9, 1, -1, 9, -1, -1, -9, -1, -1, -9, -1, -1, 9, -1, 1, 9,
@@ -64,23 +64,32 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
         return fract(sin(dot(st.xy,vec2(12.9898,78.233)))* 43758.5453123);
     }
 
-    vec3 translate(int id) {
+    float discrete(float offset) {
+        return floor(offset / 2.0) * 2.0;
+    }
+
+    vec3 translate(int id, float offset) {
         float count = ${EDGE_COUNT}.0;
         float x = -count + mod(float(id), count) * 2.0;
         float z = -count + (float(id) / count) * 2.0;
-        float y = 20.0 * sin(x * z / 1000.0) + 4.0 * rand(float(id));
-        return vec3(x, y, z);
+        //float y = 10.0 * sin((x - 10.0) * (z - discrete(offset)) / 1000.0);
+        float y = 10.0 * sin(x / 10.0) * sin((z - discrete(offset)) / 10.0);
+        float noise = 4.0 * rand(z - discrete(offset));
+        return vec3(x, y + noise, z + mod(offset, 2.0));
     }
 
     void main() {
+        float offset = now / 100.0;
+        float y = sin(-offset / 10.0);
+
         float rotation = now / 5000.0;
         mat4 model = mat4(
             cos(rotation), 0.0, -sin(rotation), 0.0,
             0.0, 1.0, 0.0, 0.0,
             sin(rotation), 0.0, cos(rotation), 0.0,
-            0.0, 0.0, 0.0, 1.0);
+            0.0, -y, 0.0, 1.0);
 
-        vec3 translation = translate(gl_InstanceID);
+        vec3 translation = translate(gl_InstanceID, offset);
         gl_Position = projection * view * model * vec4(position + translation, 1.0);
         vert_color = vec4(normal, 1.0);
     }

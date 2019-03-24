@@ -66,7 +66,8 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
         float count = ${EDGE_COUNT}.0;
         float x = -count + mod(float(id), count) * 2.0;
         float z = -count + (float(id) / count) * 2.0;
-        return vec3(x, rand(float(id)), z);
+        float y = 10.0 * sin(x * z / 1000.0) + rand(float(id));
+        return vec3(x, y, z);
     }
 
     void main() {

@@ -37,8 +37,7 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
 
     const float edge_count = ${EDGE_COUNT}.0;
 
-    // XXX When optimizing for size, pre-calculate the product of these three
-    // matrices into a single pvm matrix.
+    /// XXX When optimizing for size, pre-calculate pv.
     const mat4 projection = mat4(
         1.3, 0.0, 0.0, 0.0,
         0.0, 1.73, 0.0, 0.0,
@@ -50,19 +49,15 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
         0.0, -0.29, 0.96, 0.0,
         0.0, -19.0, -13.0, 1.0);
 
-
     float rand(float x) {
         return fract(sin(x) * 1000.0);
-    }
-
-    float discrete(float offset) {
-        return floor(offset / 2.0) * 2.0;
     }
 
     vec3 translate(float id, float offset) {
         float x = -edge_count + mod(id, edge_count) * 2.0;
         float z = -edge_count + (id / edge_count) * 2.0;
-        float move = z + discrete(offset);
+        /// Make offset discrete in increments of the cube's width.
+        float move = z + floor(offset / 2.0) * 2.0;
         float y = 10.0 * sin(x / 30.0) * sin(move / 10.0);
         float hills = 100.0 * sin(x / 100.0) * sin(move / 300.0);
         float noise = 4.0 * rand(move);

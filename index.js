@@ -69,14 +69,16 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
     vec3 translate(int id, float offset) {
         float x = -edge_count + mod(float(id), edge_count) * 2.0;
         float z = -edge_count + (float(id) / edge_count) * 2.0;
-        float y = 10.0 * sin(x / 10.0) * sin((z - discrete(offset)) / 10.0);
-        float noise = 4.0 * rand(z - discrete(offset));
-        return vec3(x, y + noise, z + mod(offset, 2.0));
+        float move = z - discrete(offset);
+        float y = 10.0 * sin(x / 10.0) * sin(move / 10.0);
+        float noise = 4.0 * rand(move);
+        float hills = 100.0 * sin(x / 100.0) * sin(move / 100.0);
+        return vec3(x, hills + y + noise, z + mod(offset, 2.0));
     }
 
     void main() {
         float offset = now / 100.0;
-        float y = sin(-offset / 10.0);
+        float y = 5.0 * sin(-offset / 10.0) + 10.0;
 
         float rotation = now / 5000.0;
         mat4 model = mat4(

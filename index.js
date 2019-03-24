@@ -42,6 +42,8 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
     layout(location = 6) in vec3 normal;
     out vec4 vert_color;
 
+    const float edge_count = ${EDGE_COUNT}.0;
+
     // XXX When optimizing for size, pre-calculate the product of these three
     // matrices into a single pvm matrix.
     const mat4 projection = mat4(
@@ -60,19 +62,13 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
         return fract(sin(x) * 1000.0);
     }
 
-    float rand2d (in vec2 st) {
-        return fract(sin(dot(st.xy,vec2(12.9898,78.233)))* 43758.5453123);
-    }
-
     float discrete(float offset) {
         return floor(offset / 2.0) * 2.0;
     }
 
     vec3 translate(int id, float offset) {
-        float count = ${EDGE_COUNT}.0;
-        float x = -count + mod(float(id), count) * 2.0;
-        float z = -count + (float(id) / count) * 2.0;
-        //float y = 10.0 * sin((x - 10.0) * (z - discrete(offset)) / 1000.0);
+        float x = -edge_count + mod(float(id), edge_count) * 2.0;
+        float z = -edge_count + (float(id) / edge_count) * 2.0;
         float y = 10.0 * sin(x / 10.0) * sin((z - discrete(offset)) / 10.0);
         float noise = 4.0 * rand(z - discrete(offset));
         return vec3(x, y + noise, z + mod(offset, 2.0));

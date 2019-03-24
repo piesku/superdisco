@@ -52,9 +52,22 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
         0.0, 0.0, 1.0, 0.0,
         0.0, 0.0, 0.0, 1.0);
 
+    float rand(float x) {
+        return fract(sin(x) * 1000.0);
+    }
+
+    float rand2d (in vec2 st) {
+        return fract(sin(dot(st.xy,vec2(12.9898,78.233)))* 43758.5453123);
+    }
+
     vec3 translate(int id) {
-        float width = 3.0 + sin(now / 1000.0);
-        return vec3(-3.0 + width * float(id), 0, 0);
+        float width = 2.0;// + sin(now / 1000.0);
+        float start_x = -50.0;
+        float start_y = -30.0;
+        float max_in_row = 50.0;
+        float x = start_x + mod(float(id), max_in_row) * width;
+        float y = start_y + (floor(float(id) / max_in_row) * width);
+        return vec3(x, rand(float(id)), y);
     }
 
     void main() {
@@ -106,7 +119,7 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
 function tick(now) {
     g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
     g.uniform1f(uniform_now, now);
-    g.drawElementsInstanced(g.TRIANGLES, 36, g.UNSIGNED_SHORT, 0, 3);
+    g.drawElementsInstanced(g.TRIANGLES, 36, g.UNSIGNED_SHORT, 0, 1000);
 
     requestAnimationFrame(tick);
 }

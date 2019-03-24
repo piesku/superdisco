@@ -62,11 +62,11 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
     vec3 translate(int id, float offset) {
         float x = -edge_count + mod(float(id), edge_count) * 2.0;
         float z = -edge_count + (float(id) / edge_count) * 2.0;
-        float move = z - discrete(offset);
+        float move = z + discrete(offset);
         float y = 10.0 * sin(x / 30.0) * sin(move / 10.0);
         float hills = 100.0 * sin(x / 100.0) * sin(move / 300.0);
         float noise = 4.0 * rand(move);
-        return vec3(x, hills + y + noise, z + mod(offset, 2.0));
+        return vec3(x, hills + y + noise, z - mod(offset, 2.0));
     }
 
     void main() {
@@ -74,10 +74,11 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
         float y = 5.0 * sin(-offset / 10.0) + 10.0;
 
         float rotx = mouse.x * 6.28;
+        float roty = mouse.y * 1.57 - 0.79;
         mat4 model = mat4(
-            cos(rotx), 0.0, -sin(rotx), 0.0,
-            0.0, 1.0, 0.0, 0.0,
-            sin(rotx), 0.0, cos(rotx), 0.0,
+            cos(rotx), sin(rotx) * sin(roty), -sin(rotx) * cos(roty), 0.0,
+            0.0, cos(roty), sin(roty), 0.0,
+            sin(rotx), -cos(rotx) * sin(roty), cos(rotx) * cos(roty), 0.0,
             0.0, -y, 0.0, 1.0);
 
         vec3 translation = translate(gl_InstanceID, offset);
@@ -102,8 +103,8 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     }
 `);
 
-let mousex = 0;
-let mousey = 0;
+let mousex = 0.5;
+let mousey = 0.5;
 a.onmousemove = e => {
     mousex = (e.clientX - e.target.offsetLeft) / e.target.width;
     mousey = (e.clientY - e.target.offsetTop) / e.target.height;

@@ -3,7 +3,7 @@ g.enable(g.DEPTH_TEST);
 g.enable(g.CULL_FACE);
 g.frontFace(g.CW);
 
-let EDGE_COUNT = 999;
+let EDGE_COUNT = 707;
 
 let vertices = Float32Array.from([
     -1, -9, 1, -1, 9, 1, -1, 9, -1, -1, -9, -1, -1, -9, -1, -1, 9, -1, 1, 9,
@@ -37,17 +37,11 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
 
     const float edge_count = ${EDGE_COUNT}.0;
 
-    /// XXX When optimizing for size, pre-calculate pv.
     const mat4 projection = mat4(
         1.299, 0.0, 0.0, 0.0,
         0.0, 1.732, 0.0, 0.0,
         0.0, 0.0, -1.002, -1.0,
         0.0, 0.0, -2.002, 0.0);
-    const mat4 view = mat4(
-        1.0, 0.0, 0.0, 0.0,
-        0.0, 0.96, 0.29, 0.0,
-        0.0, -0.29, 0.96, 0.0,
-        0.0, -19.0, -13.0, 1.0);
 
     float rand(float x) {
         return fract(sin(x) * 1000.0);
@@ -66,7 +60,7 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
 
     void main() {
         float offset = now / 100.0;
-        float y = 5.0 * sin(-offset / 10.0) + 10.0;
+        float y = 9.0 * sin(-offset / 10.0) + 30.0;
 
         float rotx = mouse.x * 6.28;
         float roty = mouse.y * 1.57 - 0.79;
@@ -77,7 +71,7 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
             0.0, -y, 0.0, 1.0);
 
         vec3 translation = translate(float(gl_InstanceID), offset);
-        gl_Position = projection * view * model * vec4(position + translation, 1.0);
+        gl_Position = projection * model * vec4(position + translation, 1.0);
         vert_position = gl_Position;
     }
 `);
@@ -89,7 +83,7 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     out vec4 frag_color;
 
     const vec4 fog_color = vec4(1.0, 0.7, 0.0, 1.0);
-    const float fog_max = 1000.0;
+    const float fog_max = 999.0;
 
     void main() {
         vec4 normal = vec4(normalize(cross(dFdx(vert_position).xyz, dFdy(vert_position).xyz)), 1.0);
@@ -98,8 +92,8 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     }
 `);
 
-let mousex = 0.5;
-let mousey = 0.5;
+let mousex = 0.6;
+let mousey = 0.6;
 a.onmousemove = e => {
     mousex = (e.clientX - e.target.offsetLeft) / e.target.width;
     mousey = (e.clientY - e.target.offsetTop) / e.target.height;

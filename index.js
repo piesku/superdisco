@@ -59,9 +59,9 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
         return floor(offset / 2.0) * 2.0;
     }
 
-    vec3 translate(int id, float offset) {
-        float x = -edge_count + mod(float(id), edge_count) * 2.0;
-        float z = -edge_count + (float(id) / edge_count) * 2.0;
+    vec3 translate(float id, float offset) {
+        float x = -edge_count + mod(id, edge_count) * 2.0;
+        float z = -edge_count + (id / edge_count) * 2.0;
         float move = z + discrete(offset);
         float y = 10.0 * sin(x / 30.0) * sin(move / 10.0);
         float hills = 100.0 * sin(x / 100.0) * sin(move / 300.0);
@@ -81,7 +81,7 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
             sin(rotx), -cos(rotx) * sin(roty), cos(rotx) * cos(roty), 0.0,
             0.0, -y, 0.0, 1.0);
 
-        vec3 translation = translate(gl_InstanceID, offset);
+        vec3 translation = translate(float(gl_InstanceID), offset);
         gl_Position = projection * view * model * vec4(position + translation, 1.0);
         vert_position = gl_Position;
     }

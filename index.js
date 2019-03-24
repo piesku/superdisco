@@ -32,7 +32,7 @@ function compile_shader(type, source) {
 let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
     uniform float now;
     uniform vec2 mouse;
-    layout(location = 5) in vec3 position;
+    in vec3 position;
     out vec4 vert_position;
 
     const float edge_count = ${EDGE_COUNT}.0;
@@ -58,10 +58,10 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
         float z = -edge_count + (id / edge_count) * 2.0;
         /// Make offset discrete in increments of the cube's width.
         float move = z + floor(offset / 2.0) * 2.0;
-        float y = 10.0 * sin(x / 30.0) * sin(move / 10.0);
-        float hills = 100.0 * sin(x / 100.0) * sin(move / 300.0);
+        float y = 9.0 * sin(x / 30.0) * sin(move / 20.0);
+        float hills = 99.0 * sin(x / 99.0) * sin(move / 300.0);
         float noise = 4.0 * rand(move);
-        return vec3(x, hills + y + noise, z - mod(offset, 2.0));
+        return vec3(x, floor(hills + y + noise), z - mod(offset, 2.0));
     }
 
     void main() {
@@ -126,8 +126,8 @@ a.onmousemove = e => {
     // Buffer vertex data for a cube.
     g.bindBuffer(g.ARRAY_BUFFER, g.createBuffer());
     g.bufferData(g.ARRAY_BUFFER, vertices, g.STATIC_DRAW);
-    g.enableVertexAttribArray(5);
-    g.vertexAttribPointer(5, 3, g.FLOAT, g.FALSE, 0, 0);
+    g.enableVertexAttribArray(0);
+    g.vertexAttribPointer(0, 3, g.FLOAT, g.FALSE, 0, 0);
 
     g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, g.createBuffer());
     g.bufferData(g.ELEMENT_ARRAY_BUFFER, indices, g.STATIC_DRAW);

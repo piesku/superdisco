@@ -3,7 +3,7 @@ g.enable(g.DEPTH_TEST);
 g.enable(g.CULL_FACE);
 g.frontFace(g.CW);
 
-let EDGE_COUNT = 300;
+let EDGE_COUNT = 999;
 
 let vertices = Float32Array.from([
     -1, -9, 1, -1, 9, 1, -1, 9, -1, -1, -9, -1, -1, -9, -1, -1, 9, -1, 1, 9,
@@ -39,10 +39,10 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
 
     /// XXX When optimizing for size, pre-calculate pv.
     const mat4 projection = mat4(
-        1.3, 0.0, 0.0, 0.0,
-        0.0, 1.73, 0.0, 0.0,
-        0.0, 0.0, -1.0, -1.0,
-        0.0, 0.0, -2.0, 0.0);
+        1.299, 0.0, 0.0, 0.0,
+        0.0, 1.732, 0.0, 0.0,
+        0.0, 0.0, -1.002, -1.0,
+        0.0, 0.0, -2.002, 0.0);
     const mat4 view = mat4(
         1.0, 0.0, 0.0, 0.0,
         0.0, 0.96, 0.29, 0.0,
@@ -89,7 +89,7 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     out vec4 frag_color;
 
     const vec4 fog_color = vec4(1.0, 0.7, 0.0, 1.0);
-    const float fog_max = 500.0;
+    const float fog_max = 1000.0;
 
     void main() {
         vec4 normal = vec4(normalize(cross(dFdx(vert_position).xyz, dFdy(vert_position).xyz)), 1.0);

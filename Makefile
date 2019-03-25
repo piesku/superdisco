@@ -1,7 +1,7 @@
 all: regpacked.js
 
 minified.js: index.js
-	@sed -e "/DEBUG/d" -e "/\/\/\//d" $< | \
+	@sed -e "/DEBUG/d" -e "/\/\/\//d" -e "s/^\s*//" $< | \
 	npx --quiet terser \
 		--mangle toplevel \
 		--compress booleans_as_integers,drop_console,ecma=6,passes=3,pure_getters,toplevel,unsafe,unsafe_math \

@@ -1,22 +1,23 @@
 g.clearColor(1.0, 0.7, 0.0, 1.0);
 g.enable(g.DEPTH_TEST);
 g.enable(g.CULL_FACE);
-g.frontFace(g.CW);
 
 let EDGE_COUNT = 707;
 
 let vertices = Float32Array.from([
-    -1, -9, 1, -1, 9, 1, -1, 9, -1, -1, -9, -1, -1, -9, -1, -1, 9, -1, 1, 9,
-    -1, 1, -9, -1, 1, -9, -1, 1, 9, -1, 1, 9, 1, 1, -9, 1, 1, -9, 1, 1, 9, 1,
-    -1, 9, 1, -1, -9, 1, -1, -9, -1, 1, -9, -1, 1, -9, 1, -1, -9, 1, 1, 9,
-    -1, -1, 9, -1, -1, 9, 1, 1, 9, 1
+    1, 9, 1, -1, 9, 1, -1, -9, 1,
+    1, -9, 1, 1, 9, 1, -1, -9, 1,
+    1, 9, 1, 1, -9, 1, 1, -9, -1,
+    1, 9, -1, 1, 9, 1, 1, -9, -1,
+    1, 9, 1, 1, 9, -1, -1, 9, -1,
+    -1, 9, 1, 1, 9, 1, -1, 9, -1,
+    -1, -9, -1, -1, 9, -1, 1, 9, -1,
+    1, -9, -1, -1, -9, -1, 1, 9, -1,
+    -1, -9, -1, -1, -9, 1, -1, 9, 1,
+    -1, 9, -1, -1, -9, -1, -1, 9, 1,
+    -1, -9, -1, 1, -9, -1, 1, -9, 1,
+    -1, -9, 1, -1, -9, -1, 1, -9, 1
 ]);
-
-let indices = Uint16Array.from([
-    23, 22, 20, 22, 21, 20, 19, 18, 16, 18, 17, 16, 15, 14, 12, 14, 13, 12,
-    11, 10, 8, 10, 9, 8, 7, 6, 4, 6, 5, 4, 3, 2, 0, 2, 1, 0
-]);
-
 
 function compile_shader(type, source) {
     let shader = g.createShader(type);
@@ -122,16 +123,13 @@ a.onmousemove = e => {
     g.bufferData(g.ARRAY_BUFFER, vertices, g.STATIC_DRAW);
     g.enableVertexAttribArray(0);
     g.vertexAttribPointer(0, 3, g.FLOAT, g.FALSE, 0, 0);
-
-    g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, g.createBuffer());
-    g.bufferData(g.ELEMENT_ARRAY_BUFFER, indices, g.STATIC_DRAW);
 }
 
 function tick(now) {
     g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
     g.uniform1f(uniform_now, now);
     g.uniform2f(uniform_mouse, mousex, mousey);
-    g.drawElementsInstanced(g.TRIANGLES, 36, g.UNSIGNED_SHORT, 0, EDGE_COUNT * EDGE_COUNT);
+    g.drawArraysInstanced(g.TRIANGLES, 0, 36, EDGE_COUNT * EDGE_COUNT);
 
     requestAnimationFrame(tick);
 }

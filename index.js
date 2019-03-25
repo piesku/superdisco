@@ -61,7 +61,7 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
 
     void main() {
         float offset = now / 100.0;
-        float y = 9.0 * sin(-offset / 10.0) + 30.0;
+        float y = 9.0 * sin(-offset / 30.0) + 30.0;
 
         float rotx = mouse.x * 6.28;
         float roty = mouse.y * 1.57 - 0.79;

@@ -31,8 +31,8 @@ function compile_shader(type, source) {
 }
 
 let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
-    uniform float now;
-    uniform vec2 mouse;
+    uniform float n;
+    uniform vec2 m;
     /// Vertex position in the mesh
     in vec3 p;
     /// Vertex position in the instance
@@ -65,14 +65,14 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
 
     void main() {
         /// The offset of the world
-        float o = now / 100.0;
+        float o = n / 100.0;
         /// The position of the camera
         float y = 9.0 * sin(-o / 30.0) + 30.0;
 
         /// Yaw
-        float a = mouse.x * 6.28;
+        float a = m.x * 6.28;
         /// Pitch
-        float b = mouse.y * 1.57 - 0.79;
+        float b = m.y * 1.57 - 0.79;
 
         f = P * mat4(
             cos(a), sin(a) * sin(b), -sin(a) * cos(b), 0.0,
@@ -122,8 +122,8 @@ a.onmousemove = e => {
     if (!g.getProgramParameter(program, g.LINK_STATUS)) // DEBUG
         throw new Error(g.getProgramInfoLog(program));  // DEBUG
 
-    var uniform_now = g.getUniformLocation(program, "now");
-    var uniform_mouse = g.getUniformLocation(program, "mouse");
+    var uniform_now = g.getUniformLocation(program, "n");
+    var uniform_mouse = g.getUniformLocation(program, "m");
 
     // And make it the only active one.
     g.useProgram(program);

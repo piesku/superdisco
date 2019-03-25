@@ -33,63 +33,75 @@ function compile_shader(type, source) {
 let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
     uniform float now;
     uniform vec2 mouse;
-    in vec3 position;
-    out vec4 vert_position;
+    /// Vertex position in the mesh
+    in vec3 p;
+    /// Vertex position in the instance
+    out vec4 f;
 
-    const float edge_count = ${EDGE_COUNT}.0;
+    /// The number of voxels along the edge of the world.
+    const float E = ${EDGE_COUNT}.0;
 
-    const mat4 projection = mat4(
+    /// Projection matrix
+    const mat4 P = mat4(
         1.299, 0.0, 0.0, 0.0,
         0.0, 1.732, 0.0, 0.0,
         0.0, 0.0, -1.002, -1.0,
         0.0, 0.0, -2.002, 0.0);
 
-    float rand(float x) {
-        return fract(sin(x) * 1000.0);
-    }
-
-    vec3 translate(float id, float offset) {
-        float x = -edge_count + mod(id, edge_count) * 2.0;
-        float z = -edge_count + (id / edge_count) * 2.0;
+    /// Compute the translation of the instance
+    vec3 t(float id, float o) {
+        float x = -E + mod(id, E) * 2.0;
+        float z = -E + (id / E) * 2.0;
         /// Make offset discrete in increments of the cube's width.
-        float move = z + floor(offset / 2.0) * 2.0;
-        float y = 9.0 * sin(x / 30.0) * sin(move / 20.0);
-        float hills = 99.0 * sin(x / 99.0) * sin(move / 300.0);
-        float noise = 4.0 * rand(move);
-        return vec3(x, floor(hills + y + noise), z - mod(offset, 2.0));
+        float Z = z + floor(o / 2.0) * 2.0;
+        return vec3(x, floor(
+            /// y
+            9.0 * sin(x / 30.0) * sin(Z / 20.0)
+            /// Hills and valleys
+            + 99.0 * sin(x / 99.0) * sin(Z / 300.0)
+            /// Random noise
+            + 4.0 * fract(sin(Z) * 1000.0)), z - mod(o, 2.0));
     }
 
     void main() {
-        float offset = now / 100.0;
-        float y = 9.0 * sin(-offset / 30.0) + 30.0;
+        /// The offset of the world
+        float o = now / 100.0;
+        /// The position of the camera
+        float y = 9.0 * sin(-o / 30.0) + 30.0;
 
-        float rotx = mouse.x * 6.28;
-        float roty = mouse.y * 1.57 - 0.79;
-        mat4 model = mat4(
-            cos(rotx), sin(rotx) * sin(roty), -sin(rotx) * cos(roty), 0.0,
-            0.0, cos(roty), sin(roty), 0.0,
-            sin(rotx), -cos(rotx) * sin(roty), cos(rotx) * cos(roty), 0.0,
-            0.0, -y, 0.0, 1.0);
+        /// Yaw
+        float a = mouse.x * 6.28;
+        /// Pitch
+        float b = mouse.y * 1.57 - 0.79;
 
-        vec3 translation = translate(float(gl_InstanceID), offset);
-        gl_Position = projection * model * vec4(position + translation, 1.0);
-        vert_position = gl_Position;
+        f = P * mat4(
+            cos(a), sin(a) * sin(b), -sin(a) * cos(b), 0.0,
+            0.0, cos(b), sin(b), 0.0,
+            sin(a), -cos(a) * sin(b), cos(a) * cos(b), 0.0,
+            0.0, -y, 0.0, 1.0) * vec4(p + t(float(gl_InstanceID), o), 1.0);
+        gl_Position = f;
     }
 `);
 
 let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     precision mediump float;
 
-    in vec4 vert_position;
-    out vec4 frag_color;
+    /// Fragment position
+    in vec4 f;
+    /// Fragment color
+    out vec4 c;
 
-    const vec4 fog_color = vec4(1.0, 0.7, 0.0, 1.0);
-    const float fog_max = 999.0;
+    /// Fog color
+    const vec4 C = vec4(1.0, 0.7, 0.0, 1.0);
+    /// Fog distance
+    const float D = 999.0;
 
     void main() {
-        vec4 normal = vec4(normalize(cross(dFdx(vert_position).xyz, dFdy(vert_position).xyz)), 1.0);
-        float distance = length(vert_position - vec4(0.0));
-        frag_color = mix(normal, fog_color, clamp(distance / fog_max, 0.0, 1.0));
+        c = mix(
+            /// Normal of the fragment
+            vec4(normalize(cross(dFdx(f).xyz, dFdy(f).xyz)), 1.0),
+            C,
+            clamp(length(f - vec4(0.0)) / D, 0.0, 1.0));
     }
 `);
 

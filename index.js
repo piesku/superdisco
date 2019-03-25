@@ -2,6 +2,7 @@ g.clearColor(1.0, 0.7, 0.0, 1.0);
 g.enable(g.DEPTH_TEST);
 g.enable(g.CULL_FACE);
 
+// The number of voxels along the edge of the world.
 let EDGE_COUNT = 707;
 
 let vertices = Float32Array.from([
@@ -38,48 +39,45 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
     // Vertex position in the instance
     out vec4 f;
 
-    // The number of voxels along the edge of the world.
-    const float E = ${EDGE_COUNT}.0;
-
     // Projection matrix
-    const mat4 P = mat4(
-        1.299, 0.0, 0.0, 0.0,
-        0.0, 1.732, 0.0, 0.0,
-        0.0, 0.0, -1.002, -1.0,
-        0.0, 0.0, -2.002, 0.0);
+    const mat4 P=mat4(
+        1.299,0.,0.,0.,
+        0.,1.732,0.,0.,
+        0.,0.,-1.002,-1.,
+        0.,0.,-2.002,0.);
 
     // Compute the translation of the instance
-    vec3 t(float id, float o) {
-        float x = -E + mod(id, E) * 2.0;
-        float z = -E + (id / E) * 2.0;
+    vec3 t(float id,float o){
+        float x=-${EDGE_COUNT}.+mod(id,${EDGE_COUNT}.)*2.;
+        float z=-${EDGE_COUNT}.+(id/${EDGE_COUNT}.)*2.;
         // Make offset discrete in increments of the cube's width.
-        float Z = z + floor(o / 2.0) * 2.0;
-        return vec3(x, floor(
+        float Z=z+floor(o/2.)*2.;
+        return vec3(x,floor(
             // y
-            9.0 * sin(x / 30.0) * sin(Z / 20.0)
+            9.*sin(x/30.)*sin(Z/20.)
             // Hills and valleys
-            + 99.0 * sin(x / 99.0) * sin(Z / 300.0)
+            +99.*sin(x/99.)*sin(Z/300.)
             // Random noise
-            + 4.0 * fract(sin(Z) * 1000.0)), z - mod(o, 2.0));
+            +4.*fract(sin(Z)*1000.)),z-mod(o,2.));
     }
 
-    void main() {
+    void main(){
         // The offset of the world
-        float o = n / 100.0;
+        float o=n/100.;
         // The position of the camera
-        float y = 9.0 * sin(-o / 30.0) + 30.0;
+        float y=9.*sin(-o/30.)+30.;
 
         // Yaw
-        float a = m.x * 6.28;
+        float a=m.x*6.28;
         // Pitch
-        float b = m.y * 1.57 - 0.79;
+        float b=m.y*1.57-0.79;
 
         f = P * mat4(
-            cos(a), sin(a) * sin(b), -sin(a) * cos(b), 0.0,
-            0.0, cos(b), sin(b), 0.0,
-            sin(a), -cos(a) * sin(b), cos(a) * cos(b), 0.0,
-            0.0, -y, 0.0, 1.0) * vec4(p + t(float(gl_InstanceID), o), 1.0);
-        gl_Position = f;
+            cos(a),sin(a)*sin(b),-sin(a)*cos(b),0.,
+            0.,cos(b),sin(b),0.,
+            sin(a),-cos(a)*sin(b),cos(a)*cos(b),0.,
+            0.,-y,0.,1.)*vec4(p+t(float(gl_InstanceID),o),1.);
+        gl_Position=f;
     }
 `);
 
@@ -92,16 +90,16 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     out vec4 c;
 
     // Fog color
-    const vec4 C = vec4(1.0, 0.7, 0.0, 1.0);
+    const vec4 C=vec4(1.,0.7,0.,1.);
     // Fog distance
-    const float D = 999.0;
+    const float D=999.;
 
-    void main() {
-        c = mix(
+    void main(){
+        c=mix(
             // Normal of the fragment
-            vec4(normalize(cross(dFdx(f).xyz, dFdy(f).xyz)), 1.0),
+            vec4(normalize(cross(dFdx(f).xyz,dFdy(f).xyz)),1.),
             C,
-            clamp(length(f - vec4(0.0)) / D, 0.0, 1.0));
+            clamp(length(f-vec4(0.))/D,0.,1.));
     }
 `);
 

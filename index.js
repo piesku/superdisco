@@ -105,9 +105,22 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     }
 `);
 
+let audio;
 let mousex = 0.6;
 let mousey = 0.6;
 a.onmousemove = e => {
+    if (!audio) {
+        audio = new AudioContext();
+        let processor = audio.createScriptProcessor(512, 1, 1);
+        processor.onaudioprocess = o => {
+            for(i = o.outputBuffer.length; i--;){
+                o.outputBuffer.getChannelData(0)[i] =
+                    Math.sin(i * timestamp) / 9;
+            }
+        };
+        processor.connect(audio.destination);
+    }
+
     mousex = (e.clientX - e.target.offsetLeft) / e.target.width;
     mousey = (e.clientY - e.target.offsetTop) / e.target.height;
 };
@@ -149,14 +162,3 @@ function tick(now) {
 }
 
 tick(0);
-
-a.onclick = e => {
-    let audio = new AudioContext();
-    let processor = audio.createScriptProcessor(512, 1, 1);
-    processor.onaudioprocess = o => {
-        for(i = o.outputBuffer.length; i--;){
-            o.outputBuffer.getChannelData(0)[i] = Math.sin(i * timestamp) / 9;
-        }
-    };
-    processor.connect(audio.destination);
-};

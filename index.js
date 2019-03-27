@@ -52,13 +52,15 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
         float z=-${EDGE_COUNT}.+(id/${EDGE_COUNT}.)*2.;
         // Make offset discrete in increments of the cube's width.
         float Z=z+floor(o/2.)*2.;
-        return vec3(x,floor(
+        return vec3(x,
             // y
             9.*sin(x/30.)*sin(Z/20.)
             // Hills and valleys
             +99.*sin(x/99.)*sin(Z/300.)
             // Random noise
-            +4.*fract(sin(Z)*1000.)),z-mod(o,2.));
+            +4.*fract(sin(Z)*1000.
+            +.1*sin(id)
+            ),z-mod(o,2.));
     }
 
     void main(){
@@ -135,7 +137,9 @@ a.onmousemove = e => {
     g.vertexAttribPointer(0, 3, g.FLOAT, g.FALSE, 0, 0);
 }
 
+let timestamp = 0;
 function tick(now) {
+    timestamp = now;
     g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
     g.uniform1f(uniform_now, now);
     g.uniform2f(uniform_mouse, mousex, mousey);
@@ -145,3 +149,14 @@ function tick(now) {
 }
 
 tick(0);
+
+a.onclick = e => {
+    let audio = new AudioContext();
+    let processor = audio.createScriptProcessor(512, 1, 1);
+    processor.onaudioprocess = o => {
+        for(i = o.outputBuffer.length; i--;){
+            o.outputBuffer.getChannelData(0)[i] = Math.sin(i * timestamp) / 9;
+        }
+    };
+    processor.connect(audio.destination);
+};

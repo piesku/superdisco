@@ -11,13 +11,14 @@ minified.js: index.js
 
 regpacked.js: minified.js
 	@npx --quiet regpack $< \
-		--crushGainFactor 1 \
-		--crushLengthFactor 0 \
+		--crushGainFactor 2 \
+		--crushLengthFactor 1 \
 		--crushCopiesFactor 0 \
 		--withMath 0 \
 		--contextType 1 \
 		--contextVariableName g \
 		--hashWebGLContext 1 \
+		--hashAudioContext 1 \
 		--wrapInSetInterval 1 \
 	> $@
 

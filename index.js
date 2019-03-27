@@ -1,4 +1,4 @@
-g.clearColor(1.0, 0.7, 0.0, 1.0);
+g.clearColor(1, .7, 0, 1);
 g.enable(g.DEPTH_TEST);
 g.enable(g.CULL_FACE);
 
@@ -56,23 +56,23 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
             // y
             9.*sin(x/30.)*sin(Z/20.)
             // Hills and valleys
-            +99.*sin(x/99.)*sin(Z/300.)
+            +99.*sin(x/99.)*sin(Z/299.)
             // Random noise
-            +4.*fract(sin(Z)*1000.
+            +4.*fract(sin(Z)*99.
             +.1*sin(id)
             ),z-mod(o,2.));
     }
 
     void main(){
         // The offset of the world
-        float o=n/100.;
+        float o=n/99.;
         // The position of the camera
         float y=9.*sin(-o/30.)+30.;
 
         // Yaw
-        float a=m.x*6.28;
+        float a=m.x*6.3;
         // Pitch
-        float b=m.y*1.57-0.79;
+        float b=m.y*1.6-.8;
 
         f = P * mat4(
             cos(a),sin(a)*sin(b),-sin(a)*cos(b),0.,
@@ -84,24 +84,21 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
 `);
 
 let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
-    precision mediump float;
+    precision lowp float;
 
     // Fragment position
     in vec4 f;
     // Fragment color
     out vec4 c;
 
-    // Fog color
-    const vec4 C=vec4(1.,0.7,0.,1.);
-    // Fog distance
-    const float D=999.;
-
     void main(){
         c=mix(
             // Normal of the fragment
             vec4(normalize(cross(dFdx(f).xyz,dFdy(f).xyz)),1.),
-            C,
-            clamp(length(f-vec4(0.))/D,0.,1.));
+            // Fog color
+            vec4(1.,.7,0.,1.),
+            // Divide length by max fog distance
+            clamp(length(f-vec4(0.))/999.,0.,1.));
     }
 `);
 

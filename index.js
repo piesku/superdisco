@@ -52,15 +52,17 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
         float z=-${EDGE_COUNT}.+(id/${EDGE_COUNT}.)*2.;
         // Make offset discrete in increments of the cube's width.
         float Z=z+floor(o/2.)*2.;
-        return vec3(x,floor(
-            // y
-            9.*sin(x/30.)*sin(Z/20.)
-            // Hills and valleys
-            +99.*sin(x/99.)*sin(Z/299.)
-            // Random noise, constant for a given (x, Z)
-            +4.*fract(sin(Z)*99.)
-            // Random noise, constant for id
-            +fract(sin(id))),
+        return vec3(
+            x,
+            floor(
+                // y
+                9.*sin(x/30.)*sin(Z/20.)
+                // Hills and valleys
+                +99.*sin(x/99.)*sin(Z/299.)
+                // Random noise, constant for a given (x, Z)
+                +4.*fract(sin(Z)*99.)
+                // Random noise, constant for id
+                +fract(sin(id))),
             z-mod(o,2.));
     }
 

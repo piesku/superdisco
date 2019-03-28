@@ -121,8 +121,8 @@ a.onmousemove = e => {
         processor.connect(audio.destination);
     }
 
-    mousex = (e.clientX - e.target.offsetLeft) / e.target.width;
-    mousey = (e.clientY - e.target.offsetTop) / e.target.height;
+    mousex = (e.clientX - a.offsetLeft) / a.width;
+    mousey = (e.clientY - a.offsetTop) / a.height;
 };
 
 {

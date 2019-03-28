@@ -153,7 +153,7 @@ b.onclick = e => {
 let timestamp = 0;
 function tick(now) {
     timestamp = now;
-    g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
+    g.clear(16640); // COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT
     g.uniform1f(uniform_now, now);
     g.uniform2f(uniform_mouse, mousex, mousey);
     g.drawArraysInstanced(g.TRIANGLES, 0, 36, EDGE_COUNT * EDGE_COUNT);

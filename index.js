@@ -103,10 +103,15 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     }
 `);
 
-let audio;
 let mousex = 0.6;
 let mousey = 0.6;
 b.onmousemove = e => {
+    mousex = e.x / a.width;
+    mousey = e.y / a.height;
+};
+
+let audio;
+b.onclick = e => {
     if (!audio) {
         audio = new AudioContext();
         let processor = audio.createScriptProcessor();
@@ -118,9 +123,6 @@ b.onmousemove = e => {
         };
         processor.connect(audio.destination);
     }
-
-    mousex = e.x / a.width;
-    mousey = e.y / a.height;
 };
 
 {

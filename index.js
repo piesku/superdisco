@@ -114,9 +114,9 @@ let audio;
 b.onclick = e => {
     if (!audio) {
         audio = new AudioContext();
-        let processor = audio.createScriptProcessor();
+        let processor = audio.createScriptProcessor(2048);
         processor.onaudioprocess = o => {
-            for(i = o.outputBuffer.length; i--;){
+            for(i = 2048; i--;){
                 o.outputBuffer.getChannelData(0)[i] =
                     Math.sin(timestamp / i) / 99 * mousey;
             }

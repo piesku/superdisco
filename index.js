@@ -5,7 +5,7 @@ g.enable(g.CULL_FACE);
 // The number of voxels along the edge of the world.
 let EDGE_COUNT = 707;
 
-let vertices = Float32Array.from([
+let vertices = Float32Array.of(
     1, 9, 1, -1, 9, 1, -1, -9, 1,
     1, -9, 1, 1, 9, 1, -1, -9, 1,
     1, 9, 1, 1, -9, 1, 1, -9, -1,
@@ -18,7 +18,7 @@ let vertices = Float32Array.from([
     -1, 9, -1, -1, -9, -1, -1, 9, 1,
     -1, -9, -1, 1, -9, -1, 1, -9, 1,
     -1, -9, 1, -1, -9, -1, 1, -9, 1
-]);
+);
 
 function compile_shader(type, source) {
     let shader = g.createShader(type);

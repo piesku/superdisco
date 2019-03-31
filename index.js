@@ -3,35 +3,33 @@ g.enable(g.DEPTH_TEST);
 g.enable(g.CULL_FACE);
 
 // The number of voxels along the edge of the world.
-let EDGE_COUNT = 707;
+let EDGE_COUNT = 707,
+    shader,
+    vertices = Float32Array.of(
+        1, 9, 1, -1, 9, 1, -1, -9, 1,
+        1, -9, 1, 1, 9, 1, -1, -9, 1,
+        1, 9, 1, 1, -9, 1, 1, -9, -1,
+        1, 9, -1, 1, 9, 1, 1, -9, -1,
+        1, 9, 1, 1, 9, -1, -1, 9, -1,
+        -1, 9, 1, 1, 9, 1, -1, 9, -1,
+        -1, -9, -1, -1, 9, -1, 1, 9, -1,
+        1, -9, -1, -1, -9, -1, 1, 9, -1,
+        -1, -9, -1, -1, -9, 1, -1, 9, 1,
+        -1, 9, -1, -1, -9, -1, -1, 9, 1,
+        -1, -9, -1, 1, -9, -1, 1, -9, 1,
+        -1, -9, 1, -1, -9, -1, 1, -9, 1
+    ),
+    compile_shader = (type, source) => {
+        shader = g.createShader(type);
+        g.shaderSource(shader, source);
+        g.compileShader(shader);
 
-let vertices = Float32Array.of(
-    1, 9, 1, -1, 9, 1, -1, -9, 1,
-    1, -9, 1, 1, 9, 1, -1, -9, 1,
-    1, 9, 1, 1, -9, 1, 1, -9, -1,
-    1, 9, -1, 1, 9, 1, 1, -9, -1,
-    1, 9, 1, 1, 9, -1, -1, 9, -1,
-    -1, 9, 1, 1, 9, 1, -1, 9, -1,
-    -1, -9, -1, -1, 9, -1, 1, 9, -1,
-    1, -9, -1, -1, -9, -1, 1, 9, -1,
-    -1, -9, -1, -1, -9, 1, -1, 9, 1,
-    -1, 9, -1, -1, -9, -1, -1, 9, 1,
-    -1, -9, -1, 1, -9, -1, 1, -9, 1,
-    -1, -9, 1, -1, -9, -1, 1, -9, 1
-);
+        if (!g.getShaderParameter(shader, g.COMPILE_STATUS)) // DEBUG
+            throw new Error(g.getShaderInfoLog(shader)); // DEBUG
 
-function compile_shader(type, source) {
-    let shader = g.createShader(type);
-    g.shaderSource(shader, source);
-    g.compileShader(shader);
-
-    if (!g.getShaderParameter(shader, g.COMPILE_STATUS)) // DEBUG
-        throw new Error(g.getShaderInfoLog(shader));     // DEBUG
-
-    return shader;
-}
-
-let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
+        return shader;
+    },
+    vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
     uniform float n;
     uniform vec2 m;
     // Vertex position in the mesh
@@ -82,9 +80,8 @@ let vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
             0.,-y,0.,1.)*vec4(p+t(float(gl_InstanceID),o),1.);
         gl_Position=f;
     }
-`);
-
-let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
+`),
+    frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     precision lowp float;
 
     // Fragment position
@@ -101,22 +98,50 @@ let frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
             // Divide length by max fog distance
             clamp(length(f-vec4(0.))/999.,0.,1.));
     }
-`);
+`),
+    mousex = 0.6,
+    mousey = 0.6,
+    audio,
+    program = g.createProgram(),
+    uniform_now, uniform_mouse,
+    timestamp = 0,
+    processor,
+    tick = now => {
+        timestamp = now;
+        g.clear(16640);
+        g.uniform1f(uniform_now, now);
+        g.uniform2f(uniform_mouse, mousex, mousey);
+        g.drawArraysInstanced(g.TRIANGLES, 0, 36, EDGE_COUNT * EDGE_COUNT);
 
-let mousex = 0.6;
-let mousey = 0.6;
+        requestAnimationFrame(tick);
+    };
+
+g.attachShader(program, vert_shader);
+g.attachShader(program, frag_shader);
+g.linkProgram(program);
+
+uniform_now = g.getUniformLocation(program, "n");
+uniform_mouse = g.getUniformLocation(program, "m");
+
+
+// And make it the only active one.
+g.useProgram(program);
+// Buffer vertex data for a cube.
+g.bindBuffer(g.ARRAY_BUFFER, g.createBuffer());
+g.bufferData(g.ARRAY_BUFFER, vertices, g.STATIC_DRAW);
+g.enableVertexAttribArray(0);
+g.vertexAttribPointer(0, 3, g.FLOAT, g.FALSE, 0, 0);
 b.onmousemove = e => {
     mousex = e.x / a.width;
     mousey = e.y / a.height;
 };
 
-let audio;
 b.onclick = e => {
     if (!audio) {
         audio = new AudioContext();
-        let processor = audio.createScriptProcessor(2048);
+        processor = audio.createScriptProcessor(2048);
         processor.onaudioprocess = o => {
-            for(i = 2048; i--;){
+            for (i = 2048; i--;) {
                 o.outputBuffer.getChannelData(0)[i] =
                     Math.sin(timestamp / i) / 99 * mousey;
             }
@@ -124,41 +149,5 @@ b.onclick = e => {
         processor.connect(audio.destination);
     }
 };
-
-{
-    // Set up the GL program.
-    var program = g.createProgram();
-    g.attachShader(program, vert_shader);
-    g.attachShader(program, frag_shader);
-    g.linkProgram(program);
-
-    if (!g.getProgramParameter(program, g.LINK_STATUS)) // DEBUG
-        throw new Error(g.getProgramInfoLog(program));  // DEBUG
-
-    var uniform_now = g.getUniformLocation(program, "n");
-    var uniform_mouse = g.getUniformLocation(program, "m");
-
-    // And make it the only active one.
-    g.useProgram(program);
-}
-
-{
-    // Buffer vertex data for a cube.
-    g.bindBuffer(g.ARRAY_BUFFER, g.createBuffer());
-    g.bufferData(g.ARRAY_BUFFER, vertices, g.STATIC_DRAW);
-    g.enableVertexAttribArray(0);
-    g.vertexAttribPointer(0, 3, g.FLOAT, g.FALSE, 0, 0);
-}
-
-let timestamp = 0;
-function tick(now) {
-    timestamp = now;
-    g.clear(16640); // COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT
-    g.uniform1f(uniform_now, now);
-    g.uniform2f(uniform_mouse, mousex, mousey);
-    g.drawArraysInstanced(g.TRIANGLES, 0, 36, EDGE_COUNT * EDGE_COUNT);
-
-    requestAnimationFrame(tick);
-}
 
 tick(0);

@@ -29,6 +29,6 @@ uniform vec3 n;in vec3 p;out vec4 f;const mat4 v=mat4(1.3,0.,0.,0.,0.,2.,0.,0.,0
 ), g.cS(o), o)), g.ah(f, (o = g.ch(35632), g.so(o,
     `#version 300 es
     precision lowp float;in vec4 f;out vec4 c;void main(){c=mix(vec4(normalize(cross(dFdx(f).xyz,dFdy(f).xyz)),1.),vec4(1.,.7,0.,1.),clamp(length(f-vec4(0.))/999.,0.,1.));}`
-), g.cS(o), o)), g.lg(f), e = g.goa(f, "n"), g.ur(f), g.bf(34962, g.cu()), g.ba(34962, n, 35044), g.eet(0), g.vto(0, 3, 5126, g.FALSE, 0, 0), b.onmousemove = (o => {
+), g.cS(o), o)), g.lg(f), e = g.goa(f, "n"), g.ur(f), g.bf(34962, g.cu()), g.ba(34962, n, 35044), g.eet(0), g.vto(0, 3, 5126, 0, 0, 0), b.onmousemove = (o => {
     c = o.x, s = o.y
 }), d(0);

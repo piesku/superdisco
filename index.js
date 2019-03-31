@@ -17,12 +17,10 @@ let o, a, e, t, n = Float32Array.of(
     1, 9, -1
 ),
     r = (a, e) => (o = g.ch(a), g.so(o, e), g.cS(o), o),
-    c = .6,
-    s = .6,
+    c = s = .6,
     f = g.cr(),
-    l = 0,
     d = o => {
-        l = o, g.c(16640), g.u3(e, Float32Array.of(o, c, s)), g.dat(5, 0, 14, 499849), requestAnimationFrame(d)
+        g.c(16640), g.u3(e, Float32Array.of(o, c, s)), g.dat(5, 0, 14, 499849), requestAnimationFrame(d)
     };
 
 g.ah(f, r(35633,
@@ -33,8 +31,4 @@ uniform ivec3 n;in vec3 p;out vec4 f;const mat4 v=mat4(1.299,0.,0.,0.,0.,1.732,0
     precision lowp float;in vec4 f;out vec4 c;void main(){c=mix(vec4(normalize(cross(dFdx(f).xyz,dFdy(f).xyz)),1.),vec4(1.,.7,0.,1.),clamp(length(f-vec4(0.))/999.,0.,1.));}`
 )), g.lg(f), e = g.goa(f, "n"), g.ur(f), g.bf(34962, g.cu()), g.ba(34962, n, 35044), g.eet(0), g.vto(0, 3, 5126, g.FALSE, 0, 0), b.onmousemove = (o => {
     c = o.x, s = o.y
-}), b.onclick = (o => {
-    a || (a = new AudioContext, (t = a.createScriptProcessor(2048)).onaudioprocess = (o => {
-        for (i = 2048; i--;) o.outputBuffer.getChannelData(0)[i] = Math.sin(l / i) / 99 * s
-    }), t.connect(a.destination))
 }), d(0);

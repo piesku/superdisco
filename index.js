@@ -1,6 +1,6 @@
 for (i in g) g[i[0] + [i[7]] + [i[13]]] = g[i];
 g.cl(1, .7, 0, 1), g.e(2929), g.e(2884), g.fc(2304);
-let o, a, e, t, n = Float32Array.of(
+let o, e, t, n = Float32Array.of(
     -1, 9, 1,
     1, 9, 1,
     -1, -9, 1,

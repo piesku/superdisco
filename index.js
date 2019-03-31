@@ -29,7 +29,24 @@ let EDGE_COUNT = 707,
 
         return shader;
     },
-    vert_shader = compile_shader(g.VERTEX_SHADER, `#version 300 es
+    mousex = 0.6,
+    mousey = 0.6,
+    audio,
+    program = g.createProgram(),
+    uniform_now, uniform_mouse,
+    timestamp = 0,
+    processor,
+    tick = now => {
+        timestamp = now;
+        g.clear(16640);
+        g.uniform1f(uniform_now, now);
+        g.uniform2f(uniform_mouse, mousex, mousey);
+        g.drawArraysInstanced(g.TRIANGLES, 0, 36, EDGE_COUNT * EDGE_COUNT);
+
+        requestAnimationFrame(tick);
+    };
+
+g.attachShader(program, compile_shader(g.VERTEX_SHADER, `#version 300 es
     uniform float n;
     uniform vec2 m;
     // Vertex position in the mesh
@@ -80,8 +97,8 @@ let EDGE_COUNT = 707,
             0.,-y,0.,1.)*vec4(p+t(float(gl_InstanceID),o),1.);
         gl_Position=f;
     }
-`),
-    frag_shader = compile_shader(g.FRAGMENT_SHADER, `#version 300 es
+`));
+g.attachShader(program, compile_shader(g.FRAGMENT_SHADER, `#version 300 es
     precision lowp float;
 
     // Fragment position
@@ -98,26 +115,7 @@ let EDGE_COUNT = 707,
             // Divide length by max fog distance
             clamp(length(f-vec4(0.))/999.,0.,1.));
     }
-`),
-    mousex = 0.6,
-    mousey = 0.6,
-    audio,
-    program = g.createProgram(),
-    uniform_now, uniform_mouse,
-    timestamp = 0,
-    processor,
-    tick = now => {
-        timestamp = now;
-        g.clear(16640);
-        g.uniform1f(uniform_now, now);
-        g.uniform2f(uniform_mouse, mousex, mousey);
-        g.drawArraysInstanced(g.TRIANGLES, 0, 36, EDGE_COUNT * EDGE_COUNT);
-
-        requestAnimationFrame(tick);
-    };
-
-g.attachShader(program, vert_shader);
-g.attachShader(program, frag_shader);
+`));
 g.linkProgram(program);
 
 uniform_now = g.getUniformLocation(program, "n");
